@@ -9,11 +9,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-st.title("💸 Filtro de Movimentações OFX (.SGML)")
-st.markdown("Envie um arquivo `.ofx` no formato **SGML**. O sistema irá remover automaticamente movimentações com os MEMOs:")
+st.title("💸 Filtro de Movimentações OFX (.TXT)")
+st.markdown("Envie um arquivo `.ofx` no formato **TXT**. O sistema irá remover automaticamente movimentações com os MEMOs:")
 st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`")
 
-uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato SGML")
+uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
 def process_ofx(file_content):
     keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL']
