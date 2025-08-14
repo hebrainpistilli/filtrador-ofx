@@ -11,12 +11,12 @@ st.set_page_config(
 
 st.title("💸 Filtro de Movimentações OFX (.TXT)")
 st.markdown("Envie um arquivo `.ofx` no formato **TXT**. O sistema irá remover automaticamente movimentações com os MEMOs:")
-st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`")
+st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.INVESTFACIL`")
 
 uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
 def process_ofx(file_content):
-    keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL']
+    keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL', 'APLIC.AUTOM.INVESTFACIL']
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
     stmttrn_blocks = []
