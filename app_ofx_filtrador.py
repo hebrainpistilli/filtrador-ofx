@@ -16,10 +16,10 @@ uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx"
 
 def process_ofx(file_content):
     keywords_excluir = [
-        'RESGATE INVEST FACIL',
+        'RESG.AUTOM.INVEST FACIL',
         'APLIC.INVEST FACIL',
         'APLIC.AUTOM.INVESTFACIL',
-        'RESG.AUTOM.INVEST FACIL',
+        'RESGATE INVEST FACIL',
     ]
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
