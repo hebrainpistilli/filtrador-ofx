@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -11,12 +10,19 @@ st.set_page_config(
 
 st.title("💸 Filtro de Movimentações OFX (.TXT)")
 st.markdown("Envie um arquivo `.ofx` no formato **TXT**. O sistema irá remover automaticamente movimentações com os MEMOs:")
-st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.INVESTFACIL`")
+st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.INVESTFACIL`\n- `RESG.AUTOM.INVEST FACIL`")
 
 uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
 def process_ofx(file_content):
-    keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL', 'APLIC.AUTOM.INVESTFACIL', 'APLIC.AUTOM.INVESTFACIL*', 'RESG.AUTOM.INVEST FACIL*']
+    # Palavras-chave a excluir (sem asteriscos ou curingas)
+    keywords_excluir = [
+        'RESGATE INVEST FACIL',
+        'APLIC.INVEST FACIL',
+        'APLIC.AUTOM.INVESTFACIL',
+        'RESG.AUTOM.INVEST FACIL'
+    ]
+
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
     stmttrn_blocks = []
@@ -43,7 +49,8 @@ def process_ofx(file_content):
         for linha in bloco:
             if linha.strip().startswith('<MEMO>'):
                 memo = linha.strip().replace('<MEMO>', '')
-                return any(memo == k or memo.endswith(k) for k in keywords_excluir)
+                # Verifica se qualquer palavra-chave está contida no memo
+                return any(k in memo for k in keywords_excluir)
         return False
 
     memos_excluidos = []
@@ -59,6 +66,7 @@ def process_ofx(file_content):
             memos_mantidos.append(memo_text)
             blocos_filtrados.append(bloco)
 
+    # Parte inicial antes dos blocos
     inicio = []
     fim = []
 
