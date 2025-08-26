@@ -15,7 +15,7 @@ st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.IN
 uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
 def process_ofx(file_content):
-    # Palavras-chave a excluir (sem asteriscos ou curingas)
+    # Lista de palavras-chave a serem removidas (sem o * pois vamos usar "in" para encontrar parcial)
     keywords_excluir = [
         'RESGATE INVEST FACIL',
         'APLIC.INVEST FACIL',
@@ -49,7 +49,6 @@ def process_ofx(file_content):
         for linha in bloco:
             if linha.strip().startswith('<MEMO>'):
                 memo = linha.strip().replace('<MEMO>', '')
-                # Verifica se qualquer palavra-chave está contida no memo
                 return any(k in memo for k in keywords_excluir)
         return False
 
@@ -66,7 +65,7 @@ def process_ofx(file_content):
             memos_mantidos.append(memo_text)
             blocos_filtrados.append(bloco)
 
-    # Parte inicial antes dos blocos
+    # Recuperar o início e fim do arquivo
     inicio = []
     fim = []
 
