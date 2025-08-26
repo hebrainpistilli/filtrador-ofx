@@ -1,5 +1,7 @@
+
 import streamlit as st
 import pandas as pd
+import unicodedata
 
 st.set_page_config(
     page_title="Filtro de OFX",
@@ -14,15 +16,19 @@ st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.IN
 
 uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
+def limpar_texto(texto):
+    texto = texto.upper()
+    texto = ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
+    texto = texto.replace('*', '').strip()
+    return texto
+
 def process_ofx(file_content):
-    # Lista de palavras-chave a serem removidas (sem o * pois vamos usar "in" para encontrar parcial)
     keywords_excluir = [
         'RESGATE INVEST FACIL',
         'APLIC.INVEST FACIL',
         'APLIC.AUTOM.INVESTFACIL',
         'RESG.AUTOM.INVEST FACIL'
     ]
-
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
     stmttrn_blocks = []
@@ -47,8 +53,8 @@ def process_ofx(file_content):
 
     def bloco_deve_ser_excluido(bloco):
         for linha in bloco:
-            if linha.strip().startswith('<MEMO>'):
-                memo = linha.strip().replace('<MEMO>', '')
+            if '<MEMO>' in linha:
+                memo = limpar_texto(linha.strip().replace('<MEMO>', ''))
                 return any(k in memo for k in keywords_excluir)
         return False
 
@@ -65,7 +71,6 @@ def process_ofx(file_content):
             memos_mantidos.append(memo_text)
             blocos_filtrados.append(bloco)
 
-    # Recuperar o início e fim do arquivo
     inicio = []
     fim = []
 
@@ -88,21 +93,17 @@ def process_ofx(file_content):
 
 if uploaded_file is not None:
     st.info("📄 Arquivo carregado com sucesso. Iniciando processamento...")
-
     with st.spinner("Processando..."):
         novo_ofx, memos_excluidos, memos_mantidos = process_ofx(uploaded_file.read())
-
     st.success("✅ Processamento concluído!")
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.subheader("🔴 MEMOs Excluídos")
         if memos_excluidos:
             st.table(pd.DataFrame(memos_excluidos, columns=["MEMO"]))
         else:
             st.write("Nenhum MEMO excluído.")
-
     with col2:
         st.subheader("🟢 MEMOs Mantidos")
         if memos_mantidos:
