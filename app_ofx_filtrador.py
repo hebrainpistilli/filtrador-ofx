@@ -27,7 +27,8 @@ def process_ofx(file_content):
         'RESGATE INVEST FACIL',
         'APLIC.INVEST FACIL',
         'APLIC.AUTOM.INVESTFACIL',
-        'RESG.AUTOM.INVEST FACIL'
+        'RESG.AUTOM.INVEST FACIL',
+        'RESG.AUTOM.INVEST FACIL*'
     ]
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
