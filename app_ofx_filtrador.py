@@ -16,7 +16,7 @@ st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.IN
 uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
 
 def process_ofx(file_content):
-    keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL', 'APLIC.AUTOM.INVESTFACIL', 'APLIC.AUTOM.INVESTFACIL*']
+    keywords_excluir = ['RESGATE INVEST FACIL', 'APLIC.INVEST FACIL', 'APLIC.AUTOM.INVESTFACIL', 'APLIC.AUTOM.INVESTFACIL*', 'RESG.AUTOM.INVEST FACIL']
     lines = file_content.decode('latin1').splitlines(keepends=True)
 
     stmttrn_blocks = []
