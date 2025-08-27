@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
 st.set_page_config(
     page_title="Filtro de OFX",
@@ -119,4 +120,13 @@ if uploaded_file is not None:
         else:
             st.write("Nenhum MEMO mantido.")
 
-    st.download_button("📥 Baixar OFX filtrado", novo_ofx, file_name="extrato_filtrado.ofx", mime="text/plain")
+    # 🎯 Nova parte do código
+    data_hoje = datetime.now().strftime("%Y-%m-%d")
+    nome_arquivo = f"OFX_Limpo_{data_hoje}.ofx"
+
+    st.download_button(
+        "📥 Baixar OFX filtrado", 
+        novo_ofx, 
+        file_name=nome_arquivo, 
+        mime="text/plain"
+    )
