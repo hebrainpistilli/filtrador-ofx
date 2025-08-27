@@ -2,19 +2,46 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+# --- Configuração da Página e Tema ---
 st.set_page_config(
     page_title="Filtro de OFX",
     page_icon="💸",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="auto" # Deixa a barra lateral aberta por padrão
 )
 
-st.title("💸 Filtro de Movimentações OFX (.TXT)")
-st.markdown("Envie um arquivo `.ofx` no formato **TXT**. O sistema irá remover automaticamente movimentações com os MEMOs:")
-st.markdown("- `RESGATE INVEST FACIL`\n- `APLIC.INVEST FACIL`\n- `APLIC.AUTOM.INVESTFACIL`\n- `RESG.AUTOM.INVEST FACIL`")
+# Adicionando um pouco de CSS para um visual mais limpo (opcional)
+st.markdown("""
+<style>
+    .reportview-container .main .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("📤 Faça upload do arquivo .ofx", type="ofx", help="Apenas arquivos OFX em formato TXT")
+# --- Barra Lateral (Sidebar) para Organização ---
+st.sidebar.title("Sobre o App ℹ️")
+st.sidebar.info(
+    "Este aplicativo é uma ferramenta para processar arquivos `.ofx` "
+    "e remover movimentações indesejadas, como aplicações e resgates automáticos. "
+    "O resultado é um extrato limpo e pronto para análise."
+)
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("Instruções 📝")
+st.sidebar.markdown(
+    "1. **Faça o upload** do seu arquivo `.ofx`.\n"
+    "2. O sistema irá **remover automaticamente** as transações com os seguintes MEMOs:\n"
+    "- `RESGATE INVEST FACIL`\n"
+    "- `APLIC.INVEST FACIL`\n"
+    "- `APLIC.AUTOM.INVESTFACIL`\n"
+    "- `RESG.AUTOM.INVEST FACIL`"
+)
+
+# --- Funções de Processamento (Sem Alterações) ---
 def process_ofx(file_content):
     keywords_excluir = [
         'RESGATE INVEST FACIL',
@@ -93,37 +120,45 @@ def process_ofx(file_content):
 
     return ''.join(novo_conteudo), memos_excluidos, memos_mantidos
 
-if uploaded_file is not None:
-    st.info("📄 Arquivo carregado com sucesso. Iniciando processamento...")
+# --- Layout Principal da Página ---
+st.title("💰 Filtro de Movimentações OFX")
+st.markdown("Use o formulário abaixo para enviar e filtrar seu extrato OFX.")
 
-    with st.spinner("Processando..."):
+uploaded_file = st.file_uploader("📥 **Upload do arquivo .ofx**", type="ofx", help="Apenas arquivos OFX em formato TXT")
+
+if uploaded_file is not None:
+    st.success("🎉 Arquivo carregado com sucesso!")
+    with st.spinner("Processando o arquivo..."):
         novo_ofx, memos_excluidos, memos_mantidos = process_ofx(uploaded_file.read())
 
-    st.success("✅ Processamento concluído!")
+    st.subheader("✅ Processamento Concluído")
 
+    # Usando colunas para um layout mais organizado
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🔴 MEMOs Excluídos")
+        st.info("🔴 **MEMOs Excluídos**")
         if memos_excluidos:
-            st.table(pd.DataFrame(memos_excluidos, columns=["MEMO"]))
+            st.dataframe(pd.DataFrame(memos_excluidos, columns=["Descrição"]), use_container_width=True)
         else:
-            st.write("Nenhum MEMO excluído.")
+            st.write("Nenhum MEMO foi excluído.")
 
     with col2:
-        st.subheader("🟢 MEMOs Mantidos")
+        st.info("🟢 **MEMOs Mantidos**")
         if memos_mantidos:
-            st.table(pd.DataFrame(memos_mantidos, columns=["MEMO"]))
+            st.dataframe(pd.DataFrame(memos_mantidos, columns=["Descrição"]), use_container_width=True)
         else:
-            st.write("Nenhum MEMO mantido.")
+            st.write("Todos os MEMOs foram mantidos.")
 
-    # 🎯 Esta é a única parte que precisa ser corrigida.
+    st.markdown("---")
+    
+    # Gerando o nome do arquivo dinâmico
     data_hoje = datetime.now().strftime("%Y-%m-%d")
     nome_arquivo = f"OFX_Limpo_{data_hoje}.ofx"
     
     st.download_button(
-        "📥 Baixar OFX filtrado", 
-        data=novo_ofx,  # Adicione o `data=` aqui para evitar confusão.
-        file_name=nome_arquivo, 
+        label="📥 **Baixar OFX Filtrado**",
+        data=novo_ofx,
+        file_name=nome_arquivo,
         mime="text/plain"
     )
