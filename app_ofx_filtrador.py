@@ -48,7 +48,6 @@ def process_ofx(file_content):
         for linha in bloco:
             if linha.strip().startswith('<MEMO>'):
                 memo = linha.strip().replace('<MEMO>', '').strip()
-                # Lógica de verificação flexível
                 for k in keywords_excluir:
                     if memo.startswith(k):
                         return True
@@ -61,10 +60,8 @@ def process_ofx(file_content):
     for bloco in stmttrn_blocks:
         memo_line = next((l for l in bloco if '<MEMO>' in l), None)
         
-        # Lógica corrigida para exibir o MEMO corretamente
         if memo_line:
             memo_text = memo_line.strip().replace('<MEMO>', '').strip()
-            # Remova o asterisco para a exibição se a string for correspondente
             if memo_text.startswith('RESG.AUTOM.INVEST FACIL'):
                 memo_text = 'RESG.AUTOM.INVEST FACIL'
         else:
@@ -120,13 +117,13 @@ if uploaded_file is not None:
         else:
             st.write("Nenhum MEMO mantido.")
 
-    # 🎯 Nova parte do código
+    # 🎯 Esta é a única parte que precisa ser corrigida.
     data_hoje = datetime.now().strftime("%Y-%m-%d")
     nome_arquivo = f"OFX_Limpo_{data_hoje}.ofx"
-
+    
     st.download_button(
         "📥 Baixar OFX filtrado", 
-        novo_ofx, 
+        data=novo_ofx,  # Adicione o `data=` aqui para evitar confusão.
         file_name=nome_arquivo, 
         mime="text/plain"
     )
